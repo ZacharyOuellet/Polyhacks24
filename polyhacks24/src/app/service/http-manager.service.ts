@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-@Injectable({
-  providedIn: 'root'
-})
+
 
 export interface solutionResponse{
   driver_alone: Array<number>;
@@ -11,6 +9,9 @@ export interface solutionResponse{
      driver_passenger_distance: number;
 }
 
+@Injectable({
+  providedIn: 'root'
+})
 export class HttpManagerService {
   constructor(private http: HttpClient) {}
 
