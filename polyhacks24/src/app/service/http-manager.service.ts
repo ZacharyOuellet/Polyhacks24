@@ -9,7 +9,7 @@ import { Node, Edge, Graph, SolutionRequest, SolutionResponse } from '../interfa
 export class HttpManagerService {
   constructor(private http: HttpClient) {}
 
- async getgrap(){
+ async getGraph(){
     return await this.http.get('http://localhost:3000/graph');
 }
 
@@ -21,6 +21,6 @@ async getSolution(graph: Graph, driverStart: number, driverEnd: number, passenge
     passenger_start: passengerStart,
     passenger_end: passengerEnd
   }
-  return await this.http.post('http://localhost:3000/solution', {requestBody});
+  return this.http.post<SolutionResponse>('http://localhost:3000/solution', {requestBody});
 }
 }
