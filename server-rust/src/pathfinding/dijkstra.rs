@@ -133,14 +133,17 @@ pub fn test() -> Vec<usize>{
 use axum::Json;
 pub async fn solution_handler(Json(request): Json<SolutionRequest>) -> Result<Json<SolutionResponse>,  Infallible> {
     let conv_graph = convert_to_petgraph(&request.graph);
-    let driver_alone = shortest_path(&conv_graph, request.driver_start, request.driver_start);
+    let driver_alone = shortest_path(&conv_graph, request.driver_start, request.driver_end);
 
     let get_to_passenger = shortest_path(&conv_graph, request.driver_start, request.passenger_start);
-    let passenger_path = shortest_path(&conv_graph, request.passenger_start, request.passenger_end);
+    let mut passenger_path = shortest_path(&conv_graph, request.passenger_start, request.passenger_end);
+    
+    passenger_path.path.pop();
+    passenger_path.path.remove(0);
+
     let get_to_destination = shortest_path(&conv_graph, request.passenger_end, request.driver_end);
     let driver_passenger_distance = get_to_passenger.distance + passenger_path.distance + get_to_destination.distance;
     let driver_passenger_path = get_to_passenger.path.iter().chain(passenger_path.path.iter()).chain(get_to_destination.path.iter()).map(|x| *x).collect();
-
 
     let return_value = SolutionResponse {
         driver_alone: driver_alone.path,
