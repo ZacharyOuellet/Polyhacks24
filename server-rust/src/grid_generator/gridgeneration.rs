@@ -1,8 +1,16 @@
-use crate::common::{Edge, Node};
-use rand::prelude::*;
-use serde_json;
+use std::convert::Infallible;
 
-pub fn generate_grid() {
+use crate::common::{Edge, Node, Graph};
+use rand::prelude::*;
+use serde::{Serialize, Deserialize};
+use axum::Json;
+#[derive(Serialize, Deserialize)]
+struct Data {
+    node_json: serde_json::Value,
+    edge_json: serde_json::Value,
+}
+
+pub async fn generate_grid() -> Result<Json<Graph>, Infallible> {
     let mut nodes: Vec<Node> = Vec::new();
     let mut edges: Vec<Edge> = Vec::new();
 
@@ -56,8 +64,11 @@ pub fn generate_grid() {
         .unwrap_or_else(|err| panic!("Failed to write nodes JSON to file: {}", err));
     std::fs::write("src/data_edges.json", &edges_json)
         .unwrap_or_else(|err| panic!("Failed to write edges JSON to file: {}", err));
-
     println!("done!");
+    Ok(Json(Graph {
+        nodes: nodes,
+        edges: edges,
+    }))
 }
 
 pub fn check_if_edge_is_valid(edges: &Vec<Edge>, nodes: &Vec<Node>) -> bool {
