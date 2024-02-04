@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { NodeIdObj } from 'src/app/interfaces';
 import { NoeuComponent } from '../noeu/noeu.component';
 import * as d3 from 'd3';
+import { GraphService } from 'src/app/service/graph.service';
 //https://blog.logrocket.com/data-visualization-angular-d3-js/#setting-up-angular-d3
 
 @Component({
@@ -11,8 +13,9 @@ import * as d3 from 'd3';
 })
 
 export class SvgMapComponent implements OnInit {
-    @Input() nodes;
+    nodes : NodeIdObj[] = [];
     @Input() links : number[][];
+    
     ratioX : number = 890-50;
     ratioY : number = 480-50;
     nodeId : number = -1;
@@ -23,12 +26,15 @@ export class SvgMapComponent implements OnInit {
       passDep: '',
       passArr: ''
     };
-    constructor(){
-      this.nodes = [
-        { id: 0, x:0.7, y: 0.5 },
-        { id: 1, x: 0.1, y: 0.8 },
-        { id: 2, x: 0.6, y: 0.3 }
-      ];
+    constructor(private graphService: GraphService){
+      let i = 0;
+      this.graphService.graph.nodes.forEach(node => {
+        let element = { id:i, x:node.x, y: node.y};
+       
+        this.nodes.push(element);
+        i++;
+      });
+      
       this.links = [[0,1],[1,2],[2,0]]
     }
 

@@ -27,3 +27,9 @@ export interface SolutionResponse {
     driver_passenger: number[];
     driver_passenger_distance: number;
 }
+
+export interface NodeIdObj {
+    x: number;
+    y: number;
+    id: number;
+}
