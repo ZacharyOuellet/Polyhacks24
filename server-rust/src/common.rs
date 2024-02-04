@@ -1,21 +1,11 @@
 use std::fmt::Debug;
 
-use serde::Serialize;
-use serde::ser::SerializeStruct;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct Node {
     pub x: f32,
     pub y: f32
-}
-impl Serialize for Node {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_struct("Node", 2)?;
-        state.serialize_field("x", &self.x)?;
-        state.serialize_field("y", &self.y)?;
-        state.end()
-    }
 }
 
 impl Debug for Node {
@@ -25,12 +15,14 @@ impl Debug for Node {
 }
 
 
-
+#[derive(Serialize, Deserialize)]
 pub struct Edge{
     pub from_index: usize,
     pub to_index: usize,
 }
 
+
+#[derive(Serialize, Deserialize)]
 pub struct Graph{
     pub nodes: Vec<Node>,
     pub edges: Vec<Edge>,
