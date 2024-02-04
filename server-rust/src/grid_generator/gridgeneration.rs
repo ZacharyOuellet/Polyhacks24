@@ -27,6 +27,7 @@ pub fn generate_grid() {
             let mut rng = thread_rng();
             edges.shuffle(&mut rng);
             let i2 = available_nodes.pop().unwrap();
+            if(i2 != i){
             if nodes.get(i).unwrap().x < nodes.get(i2).unwrap().x {
                 edges.push(Edge {
                     from_index: i,
@@ -37,7 +38,7 @@ pub fn generate_grid() {
                     from_index: i2,
                     to_index: i,
                 });
-            }
+            }}
             k += 1;
         }
     }
