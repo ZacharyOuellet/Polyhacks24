@@ -3,6 +3,14 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
+
+export interface solutionResponse{
+  driver_alone: Array<number>;
+   driver_alone_distance: number;
+    driver_passenger: Array<number>;
+     driver_passenger_distance: number;
+}
+
 export class HttpManagerService {
   constructor(private http: HttpClient) {}
 
