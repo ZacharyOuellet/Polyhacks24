@@ -15,38 +15,82 @@ pub async fn generate_grid() -> Result<Json<Graph>, Infallible> {
     let mut edges: Vec<Edge> = Vec::new();
 
     nodes.push(create_random_node(0));
+    nodes.push(create_random_node(1));
+    edges.push(Edge {
+        from_index: 0,
+        to_index: 1,
+    });
 
-    for i in 1..99 {
-        nodes.push(create_random_node(i));
-        let mut available_nodes: Vec<usize> = Vec::new();
+    for new_node_i in 2..10 {
+        println!("New node: {}", new_node_i);
+        nodes.push(create_random_node(new_node_i));
+        let mut available_edges: Vec<Edge> = Vec::new();
+        
+        for other_node_i in 0..nodes.len()-1 {
+            if new_node_i == other_node_i {
+                continue;
+            }
+            let mut intersects = false;
+            for edge in edges.iter() {
+                println!("  Checking edge: {:?}", edge);
+                if edge.from_index == new_node_i || edge.to_index == new_node_i {
+                    continue;
+                }
+                let mut point11 = nodes.get(new_node_i).unwrap();
+                let mut point12 = nodes.get(other_node_i).unwrap();
 
-        for (index, node) in nodes.iter().enumerate() {
-            if check_if_edge_is_valid(&edges, &nodes) {
-                available_nodes.push(index);
+                if point11.x > point12.x {
+                    std::mem::swap(&mut point11, &mut point12);
+                }
+                
+                let mut point21 = nodes.get(edge.from_index).unwrap();
+                let mut point22 = nodes.get(edge.to_index).unwrap();
+                if point21.x > point22.x {
+                    std::mem::swap(&mut point21, &mut point22);
+                }
+
+                let x_diff1 = point12.x - point11.x;
+                let y_diff1 = point12.y - point11.y;
+                let x_diff2 = point22.x - point21.x;
+                let y_diff2 = point22.y - point21.y;
+                let determinant = x_diff1 * y_diff2 - x_diff2 * y_diff1;
+
+                if determinant != 0.0 {
+                    // Lines are not parallel
+                    let x_diff3 = point21.x - point11.x;
+                    let y_diff3 = point21.y - point11.y;
+
+                    let t = (x_diff3 * y_diff2 - x_diff2 * y_diff3) / determinant;
+                    let u = (x_diff1 * y_diff3 - x_diff3 * y_diff1) / -determinant;
+                    println!("    t: {}, u: {}", t, u);
+                    if t > 0.0 && t < 1.0 && u > 0.0 && u < 1.0 {
+                        println!("    Intersects: ({:?},{:?}) ({:?},{:?})", point11, point12, point21, point22);
+                        intersects = true;
+                        break; // Lines intersect
+                    }
+                }
+            }
+            println!("  Done checking, intersects? {}", intersects);
+            if !intersects {
+                let available = Edge {
+                    from_index: new_node_i,
+                    to_index: other_node_i,
+                };
+                println!("  adding {:?}", available);
+
+                available_edges.push(available);
             }
         }
-        let mut k = 0;
-        while k <= 5 {
+        println!("Available edges: {:?}", available_edges);
+        for _ in 0..3 {
             // Do something in the loop
-            if available_nodes.last().is_none() {
+            if available_edges.last().is_none() {
                 break;
             }
             let mut rng = thread_rng();
-            edges.shuffle(&mut rng);
-            let i2 = available_nodes.pop().unwrap();
-            if(i2 != i){
-            if nodes.get(i).unwrap().x < nodes.get(i2).unwrap().x {
-                edges.push(Edge {
-                    from_index: i,
-                    to_index: i2,
-                });
-            } else {
-                edges.push(Edge {
-                    from_index: i2,
-                    to_index: i,
-                });
-            }}
-            k += 1;
+            available_edges.shuffle(&mut rng);
+            let rand_edge = available_edges.pop().unwrap();
+            edges.push(rand_edge);
         }
     }
 
