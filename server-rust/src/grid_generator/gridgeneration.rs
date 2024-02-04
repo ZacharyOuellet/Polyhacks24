@@ -14,19 +14,26 @@ pub fn generate_grid() {
         let mut available_nodes: Vec<usize> = Vec::new();
 
         for (index, node) in nodes.iter().enumerate() {
-                if check_if_edge_is_valid(&edges, &nodes) {
-                        available_nodes.push(index);
-                }
+            if check_if_edge_is_valid(&edges, &nodes) {
+                available_nodes.push(index);
+            }
         }
         let mut k = 0;
         while k <= 5 {
             // Do something in the loop
-            if available_nodes.last().is_none()
-            {break;}
-            
-                k += 1;}    
+            if available_nodes.last().is_none() {
+                break;
+            }
+            let mut rng = thread_rng();
+            edges.shuffle(&mut rng);
+            let i2 = available_nodes.pop().unwrap();
+            edges.push(Edge {
+                from_index: i,
+                to_index: i2,
+            });
+            k += 1;
         }
-        
+    }   
     println!("{:?}", nodes);
     println!("{:?}", edges);
 
