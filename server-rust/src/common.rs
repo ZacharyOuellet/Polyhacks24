@@ -5,7 +5,7 @@ use serde::{Serialize, Deserialize};
 #[derive(Serialize, Deserialize)]
 pub struct Node {
     pub x: f32,
-    pub y: f32
+    pub y: f32,
 }
 
 impl Debug for Node {
@@ -14,8 +14,7 @@ impl Debug for Node {
     }
 }
 
-
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Edge{
     pub from_index: usize,
     pub to_index: usize,
