@@ -1,14 +1,15 @@
-use axum::{routing::get, Router};
+use axum::{routing::{get,post}, Router};
 use grid_generator::gridgeneration;
 pub mod grid_generator;
 pub mod pathfinding;
 use pathfinding::dijkstra;
 pub mod common;
+
 #[tokio::main]
 async fn main() {
     let app = Router::new()
         .route("/", get(|| async { "Hello, Rust!" }))
-        .route("/solution", get(dijkstra::placeholder));
+        .route("/solution", post(dijkstra::solution_handler));
     gridgeneration::generate_grid();
     dijkstra::test();
 

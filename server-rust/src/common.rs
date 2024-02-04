@@ -27,7 +27,7 @@ pub struct Graph{
     pub edges: Vec<Edge>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 pub struct SolutionRequest{
     pub graph: Graph,
     pub driver_start: usize,
@@ -36,6 +36,8 @@ pub struct SolutionRequest{
     pub passenger_end: usize,
 }
 
+
+#[derive(Serialize)]
 pub struct SolutionResponse{
     pub driver_alone: Vec<usize>,
     pub driver_alone_distance: f32,

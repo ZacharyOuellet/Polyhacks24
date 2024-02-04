@@ -2,8 +2,8 @@ use petgraph::graph::UnGraph;
 use petgraph::prelude::NodeIndex;
 use crate::pathfinding::path_types::PathNode;
 use std::collections::BinaryHeap;
-use std::path;
-use crate::common::{Graph, Node};
+use std::convert::Infallible;
+use crate::common::{Graph, Node, SolutionRequest, SolutionResponse};
 use crate::pathfinding::graph_converter::convert_to_petgraph;
 
 
@@ -32,7 +32,12 @@ impl PartialEq for HeapElement {
     }
 }
 
-pub fn shortest_path(graph: &UnGraph<Node, f32>, start: usize, end: usize) -> Vec<usize> {
+struct PathResult {
+    distance: f32,
+    path: Vec<usize>,
+}
+
+pub fn shortest_path(graph: &UnGraph<Node, f32>, start: usize, end: usize) -> PathResult {
     let mut path_nodes = vec![PathNode {index:0,distance:f32::INFINITY, seen: false, explored: false, predecessor: 0 }; graph.node_count()];
     path_nodes[start].index = start;
     path_nodes[start].distance = 0.0;
@@ -58,7 +63,7 @@ pub fn shortest_path(graph: &UnGraph<Node, f32>, start: usize, end: usize) -> Ve
             }
         }
     }
-    println!("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA{:?}", path_nodes);
+    println!("Path:{:?}", path_nodes);
 
     let mut path = Vec::new();
     let mut current = end;
@@ -68,7 +73,7 @@ pub fn shortest_path(graph: &UnGraph<Node, f32>, start: usize, end: usize) -> Ve
     }
     path.push(start);
     path.reverse();
-    path
+    PathResult { distance: path_nodes[end].distance, path: path }
 }
 
 pub fn test() -> Vec<usize>{
@@ -119,14 +124,30 @@ pub fn test() -> Vec<usize>{
     let petgraph = convert_to_petgraph(&graph);
     println!("{:?}", petgraph);
     let path = shortest_path(&petgraph, 3, 2);
-    println!("{:?}", path);
-    path
+    println!("{:?}", path.path);
+    println!("{:?}", Json(graph));
+    path.path
 }
 
 
 use axum::Json;
-pub async fn placeholder(Json(graph): Json<Graph>) -> Json<Vec<usize>> {
-    let conv_graph = convert_to_petgraph(&graph);
-    let return_value = shortest_path(&conv_graph, 0, graph.nodes.len() - 1);
-    Json(return_value)
+pub async fn solution_handler(Json(request): Json<SolutionRequest>) -> Result<Json<SolutionResponse>,  Infallible> {
+    let conv_graph = convert_to_petgraph(&request.graph);
+    let driver_alone = shortest_path(&conv_graph, request.driver_start, request.driver_start);
+
+    let get_to_passenger = shortest_path(&conv_graph, request.driver_start, request.passenger_start);
+    let passenger_path = shortest_path(&conv_graph, request.passenger_start, request.passenger_end);
+    let get_to_destination = shortest_path(&conv_graph, request.passenger_end, request.driver_end);
+    let driver_passenger_distance = get_to_passenger.distance + passenger_path.distance + get_to_destination.distance;
+    let driver_passenger_path = get_to_passenger.path.iter().chain(passenger_path.path.iter()).chain(get_to_destination.path.iter()).map(|x| *x).collect();
+
+
+    let return_value = SolutionResponse {
+        driver_alone: driver_alone.path,
+        driver_alone_distance: driver_alone.distance,
+        driver_passenger: driver_passenger_path,
+        driver_passenger_distance: driver_passenger_distance,
+    };
+
+    Ok(Json(return_value))
 }
