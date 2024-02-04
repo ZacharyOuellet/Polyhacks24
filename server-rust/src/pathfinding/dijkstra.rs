@@ -3,7 +3,7 @@ use petgraph::prelude::NodeIndex;
 use crate::pathfinding::path_types::PathNode;
 use std::collections::BinaryHeap;
 use std::convert::Infallible;
-use crate::common::{Graph, Node, SolutionRequest, SolutionResponse};
+use crate::common::{Node, SolutionRequest, SolutionResponse};
 use crate::pathfinding::graph_converter::convert_to_petgraph;
 
 
@@ -37,7 +37,7 @@ struct PathResult {
     path: Vec<usize>,
 }
 
-pub fn shortest_path(graph: &UnGraph<Node, f32>, start: usize, end: usize) -> PathResult {
+fn shortest_path(graph: &UnGraph<Node, f32>, start: usize, end: usize) -> PathResult {
     let mut path_nodes = vec![PathNode {index:0,distance:f32::INFINITY, seen: false, explored: false, predecessor: 0 }; graph.node_count()];
     path_nodes[start].index = start;
     path_nodes[start].distance = 0.0;
@@ -75,60 +75,6 @@ pub fn shortest_path(graph: &UnGraph<Node, f32>, start: usize, end: usize) -> Pa
     path.reverse();
     PathResult { distance: path_nodes[end].distance, path: path }
 }
-
-pub fn test() -> Vec<usize>{
-    let graph = Graph {
-        nodes: vec![
-            crate::common::Node { x: 0.0, y: 0.0 },
-            crate::common::Node { x: 0.1, y: 1.0 },
-            crate::common::Node { x: 1.0, y: 1.0 },
-            crate::common::Node { x: 0.5, y: 0.2 },
-            crate::common::Node { x: 0.5, y: 0.0 },
-            crate::common::Node { x: 1.0, y: 0.05 },
-        ],
-        edges: vec![
-            crate::common::Edge {
-                from_index: 0,
-                to_index: 1,
-            },
-            crate::common::Edge {
-                from_index: 0,
-                to_index: 3,
-            },
-            crate::common::Edge {
-                from_index: 0,
-                to_index: 4,
-            },
-            crate::common::Edge {
-                from_index: 4,
-                to_index: 5,
-            },
-            crate::common::Edge {
-                from_index: 5,
-                to_index: 3,
-            },
-            crate::common::Edge {
-                from_index: 3,
-                to_index: 1,
-            },
-            crate::common::Edge {
-                from_index: 1,
-                to_index: 2,
-            },
-            crate::common::Edge {
-                from_index: 2,
-                to_index: 5,
-            },
-        ],
-    };
-    let petgraph = convert_to_petgraph(&graph);
-    println!("{:?}", petgraph);
-    let path = shortest_path(&petgraph, 3, 2);
-    println!("{:?}", path.path);
-    println!("{:?}", Json(graph));
-    path.path
-}
-
 
 use axum::Json;
 pub async fn solution_handler(Json(request): Json<SolutionRequest>) -> Result<Json<SolutionResponse>,  Infallible> {

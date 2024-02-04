@@ -11,7 +11,6 @@ async fn main() {
         .route("/", get(|| async { "Hello, Rust!" }))
         .route("/solution", post(dijkstra::solution_handler));
     gridgeneration::generate_grid();
-    dijkstra::test();
 
     println!("Running on http://localhost:3000");
     axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
