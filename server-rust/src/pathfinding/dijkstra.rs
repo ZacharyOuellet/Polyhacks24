@@ -1,9 +1,8 @@
-
-use axum::extract::path;
 use petgraph::graph::UnGraph;
 use petgraph::prelude::NodeIndex;
 use crate::pathfinding::path_types::PathNode;
 use std::collections::BinaryHeap;
+use std::path;
 use crate::common::{Graph, Node};
 use crate::pathfinding::graph_converter::convert_to_petgraph;
 
@@ -72,17 +71,39 @@ pub fn shortest_path(graph: &UnGraph<Node, f32>, start: usize, end: usize) -> Ve
     path
 }
 
-pub fn test(){
+pub fn test() -> Vec<usize>{
     let graph = Graph {
         nodes: vec![
             crate::common::Node { x: 0.0, y: 0.0 },
-            crate::common::Node { x: 1.5, y: 0.0 },
-            crate::common::Node { x: 1.0, y: 2.0 },
-            crate::common::Node { x: 0.0, y: 1.0 },
+            crate::common::Node { x: 0.1, y: 1.0 },
+            crate::common::Node { x: 1.0, y: 1.0 },
+            crate::common::Node { x: 0.5, y: 0.2 },
+            crate::common::Node { x: 0.5, y: 0.0 },
+            crate::common::Node { x: 1.0, y: 0.05 },
         ],
         edges: vec![
             crate::common::Edge {
                 from_index: 0,
+                to_index: 1,
+            },
+            crate::common::Edge {
+                from_index: 0,
+                to_index: 3,
+            },
+            crate::common::Edge {
+                from_index: 0,
+                to_index: 4,
+            },
+            crate::common::Edge {
+                from_index: 4,
+                to_index: 5,
+            },
+            crate::common::Edge {
+                from_index: 5,
+                to_index: 3,
+            },
+            crate::common::Edge {
+                from_index: 3,
                 to_index: 1,
             },
             crate::common::Edge {
@@ -91,16 +112,21 @@ pub fn test(){
             },
             crate::common::Edge {
                 from_index: 2,
-                to_index: 3,
-            },
-            crate::common::Edge {
-                from_index: 3,
-                to_index: 0,
+                to_index: 5,
             },
         ],
     };
     let petgraph = convert_to_petgraph(&graph);
     println!("{:?}", petgraph);
-    let path = shortest_path(&petgraph, 0, 2);
+    let path = shortest_path(&petgraph, 3, 2);
     println!("{:?}", path);
+    path
+}
+
+
+use axum::Json;
+pub async fn placeholder(Json(graph): Json<Graph>) -> Json<Vec<usize>> {
+    let conv_graph = convert_to_petgraph(&graph);
+    let return_value = shortest_path(&conv_graph, 0, graph.nodes.len() - 1);
+    Json(return_value)
 }
