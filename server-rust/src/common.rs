@@ -4,8 +4,8 @@ pub struct Node {
 }
 
 pub struct Edge{
-    pub from_index: i32,
-    pub to_index: i32,
+    pub from_index: usize,
+    pub to_index: usize,
 }
 
 pub struct Graph{
