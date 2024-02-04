@@ -1,25 +1,25 @@
-use crate::common::Graph;
-use crate::pathfinding::path_types::PathNode;
+use crate::common::{Graph, Node};
 
-use petgraph::graph::Graph as PetGraph;
+use petgraph::graph::{Graph as PetGraph, UnGraph};
 
-pub fn convert_to_petgraph(graph: &Graph) -> PetGraph<PathNode, f32> {
-    let mut petgraph = PetGraph::new();
-    let mut nodes = Vec::new();
-    for (index, node) in graph.nodes.iter().enumerate() {
-        nodes.push(petgraph.add_node(PathNode {
-            index: index,
-            x: node.x,
-            y: node.y,
-            seen: false,
-            explored: false,
-            distance: 0.0,
-        }));
+pub fn convert_to_petgraph(graph: &Graph) -> UnGraph<Node, f32> {
+    let mut petgraph = PetGraph::new_undirected();
+    let mut node_indices = Vec::new(); 
+
+    for node in graph.nodes.iter() {
+        let node_clone = Node { x: node.x, y: node.y };
+        let i = petgraph.add_node(node_clone); 
+        node_indices.push(i);
     }
+
     for edge in &graph.edges {
+        let from_index = node_indices[edge.from_index];
+        let to_index = node_indices[edge.to_index];
+
         let distance = ((graph.nodes[edge.from_index].x - graph.nodes[edge.to_index].x).powi(2) + (graph.nodes[edge.from_index].y - graph.nodes[edge.to_index].y).powi(2)).sqrt();
-        petgraph.add_edge(nodes[edge.from_index], nodes[edge.to_index], distance);
+        petgraph.add_edge(from_index, to_index, distance); // Use the node indices to add the edge
     }
+
     petgraph
 }
 
@@ -27,8 +27,8 @@ pub fn test() {
     let graph = Graph {
         nodes: vec![
             crate::common::Node { x: 0.0, y: 0.0 },
-            crate::common::Node { x: 1.5, y: 0.0 },
-            crate::common::Node { x: 1.0, y: 2.0 },
+            crate::common::Node { x: 1.0, y: 0.0 },
+            crate::common::Node { x: 1.0, y: 1.0 },
             crate::common::Node { x: 0.0, y: 1.0 },
         ],
         edges: vec![

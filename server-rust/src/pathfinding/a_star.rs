@@ -1,16 +1,23 @@
-use petgraph::graph::Graph as PetGraph;
+use petgraph::graph::UnGraph;
 use petgraph::prelude::NodeIndex;
 use crate::pathfinding::path_types::PathNode;
-
-use crate::common::Graph;
+use std::collections::BinaryHeap;
+use crate::common::{Graph, Node};
 use crate::pathfinding::graph_converter::convert_to_petgraph;
 
-fn distance_between_nodes(node1: &PathNode, node2: &PathNode) -> f32 {
+
+
+fn distance_between_nodes(node1: &Node, node2: &Node) -> f32 {
     ((node1.x - node2.x).powi(2) + (node1.y - node2.y).powi(2)).sqrt()
 }
 
-pub fn shortest_path(graph: &PetGraph<PathNode, f32>, start: usize, end: usize) -> Vec<usize> {
-    let end_node = graph.node_weight(NodeIndex::new(end)).unwrap();
+pub fn shortest_path(graph: &UnGraph<Node, f32>, start: usize, end: usize) -> Vec<usize> {
+
+    let mut path_nodes: Vec<PathNode> = Vec::new();
+    
+    let end_node = graph.node_weight(NodeIndex::new(end));
+    let mut to_explore: BinaryHeap<&PathNode> = BinaryHeap::new();
+    let start_node = graph.node_weight(NodeIndex::new(start));
     Vec::new()
 }
 
