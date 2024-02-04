@@ -3,14 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Node, Edge, Graph, SolutionRequest, SolutionResponse } from '../interfaces';
 
 
-
-export interface solutionResponse{
-  driver_alone: Array<number>;
-   driver_alone_distance: number;
-    driver_passenger: Array<number>;
-     driver_passenger_distance: number;
-}
-
 @Injectable({
   providedIn: 'root'
 })
