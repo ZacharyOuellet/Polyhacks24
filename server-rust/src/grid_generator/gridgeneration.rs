@@ -14,10 +14,10 @@ pub async fn generate_grid() -> Result<Json<Graph>, Infallible> {
     let mut nodes: Vec<Node> = Vec::new();
     let mut edges: Vec<Edge> = Vec::new();
 
-    nodes.push(create_random_node());
+    nodes.push(create_random_node(0));
 
-    for i in 0..98 {
-        nodes.push(create_random_node());
+    for i in 1..99 {
+        nodes.push(create_random_node(i));
         let mut available_nodes: Vec<usize> = Vec::new();
 
         for (index, node) in nodes.iter().enumerate() {
@@ -29,7 +29,6 @@ pub async fn generate_grid() -> Result<Json<Graph>, Infallible> {
         while k <= 5 {
             // Do something in the loop
             if available_nodes.last().is_none() {
-                print!("RAWR");
                 break;
             }
             let mut rng = thread_rng();
@@ -50,21 +49,7 @@ pub async fn generate_grid() -> Result<Json<Graph>, Infallible> {
             k += 1;
         }
     }
-    println!("{:?}", nodes);
-    println!("{:?}", edges);
 
-    // Convert the arrays to JSON
-    let nodes_json = serde_json::to_string(&nodes)
-        .unwrap_or_else(|err| panic!("Failed to convert nodes to JSON: {}", err));
-    let edges_json = serde_json::to_string(&edges)
-        .unwrap_or_else(|err| panic!("Failed to convert edges to JSON: {}", err));
-
-    // Save the JSON to files
-    std::fs::write("src/data_nodes.json", &nodes_json)
-        .unwrap_or_else(|err| panic!("Failed to write nodes JSON to file: {}", err));
-    std::fs::write("src/data_edges.json", &edges_json)
-        .unwrap_or_else(|err| panic!("Failed to write edges JSON to file: {}", err));
-    println!("done!");
     Ok(Json(Graph {
         nodes: nodes,
         edges: edges,
@@ -144,8 +129,9 @@ pub fn might_touch(edge1: &Edge, edge2: &Edge, nodes: &Vec<Node>) -> bool {
     touches
 }
 
-pub fn create_random_node() -> Node {
+pub fn create_random_node(id:usize) -> Node {
     Node {
+        id: id,
         x: thread_rng().gen_range(0.0..1.0),
         y: thread_rng().gen_range(0.0..1.0),
     }

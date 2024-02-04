@@ -1,18 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable , OnInit} from '@angular/core';
 import { HttpManagerService } from './http-manager.service';
 import { Graph, SolutionRequest, SolutionResponse } from '../interfaces';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
-export class GraphService {
+export class GraphService implements OnInit{
     public graph: Graph;
     public driverStart: number;
     public driverEnd: number;
     public passengerStart: number;
     public passengerEnd: number;
-    async regenarateGraph() {
-        this.graph = await this.httpManager.getGraph() as unknown as Graph;
+
+    public solution: SolutionResponse;
+    regenarateGraph() {
+        
+        console.log("getting graph")
+        return(this.httpManager.getGraph());
     }
 
     constructor(private httpManager: HttpManagerService) { 
@@ -24,9 +28,19 @@ export class GraphService {
         this.driverEnd = 0;
         this.passengerStart = 0;
         this.passengerEnd = 0;
-        this.regenarateGraph();
+        this.solution = {
+            driver_alone: [],
+            driver_alone_distance: 0,
+            driver_passenger: [],
+            driver_passenger_distance: 0
+        };
     }
 
+    async ngOnInit() {
+        console.log("graph init");
+        await this.regenarateGraph();
+        console.log(this.graph);
+    }
 
     async getSolution(){
         if (this.graph.nodes.length == 0) {

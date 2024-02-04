@@ -7,7 +7,7 @@ pub fn convert_to_petgraph(graph: &Graph) -> UnGraph<Node, f32> {
     let mut node_indices = Vec::new(); 
 
     for node in graph.nodes.iter() {
-        let node_clone = Node { x: node.x, y: node.y };
+        let node_clone = Node {id:node.id, x: node.x, y: node.y };
         let i = petgraph.add_node(node_clone); 
         node_indices.push(i);
     }
@@ -23,33 +23,3 @@ pub fn convert_to_petgraph(graph: &Graph) -> UnGraph<Node, f32> {
     petgraph
 }
 
-pub fn test() {
-    let graph = Graph {
-        nodes: vec![
-            crate::common::Node { x: 0.0, y: 0.0 },
-            crate::common::Node { x: 1.0, y: 0.0 },
-            crate::common::Node { x: 1.0, y: 1.0 },
-            crate::common::Node { x: 0.0, y: 1.0 },
-        ],
-        edges: vec![
-            crate::common::Edge {
-                from_index: 0,
-                to_index: 1,
-            },
-            crate::common::Edge {
-                from_index: 1,
-                to_index: 2,
-            },
-            crate::common::Edge {
-                from_index: 2,
-                to_index: 3,
-            },
-            crate::common::Edge {
-                from_index: 3,
-                to_index: 0,
-            },
-        ],
-    };
-    let petgraph = convert_to_petgraph(&graph);
-    println!("{:?}", petgraph);
-}

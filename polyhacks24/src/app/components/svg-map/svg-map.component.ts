@@ -1,6 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
 import { NodeIdObj } from 'src/app/interfaces';
 import { NoeuComponent } from '../noeu/noeu.component';
+
+import { Graph } from 'src/app/interfaces';
 import * as d3 from 'd3';
 import { GraphService } from 'src/app/service/graph.service';
 //https://blog.logrocket.com/data-visualization-angular-d3-js/#setting-up-angular-d3
@@ -12,9 +14,7 @@ import { GraphService } from 'src/app/service/graph.service';
   styleUrls: ['./svg-map.component.scss']
 })
 
-export class SvgMapComponent implements OnInit {
-    nodes : NodeIdObj[] = [];
-    @Input() links : number[][];
+export class SvgMapComponent  {
     
     ratioX : number = 890-50;
     ratioY : number = 480-50;
@@ -27,28 +27,31 @@ export class SvgMapComponent implements OnInit {
       passArr: ''
     };
     constructor(private graphService: GraphService){
-      let i = 0;
-      this.graphService.graph.nodes.forEach(node => {
-        let element = { id:i, x:node.x, y: node.y};
-       
-        this.nodes.push(element);
-        i++;
-      });
-      
-      this.links = [[0,1],[1,2],[2,0]]
     }
 
-    ngOnInit(): void {
-      const svg = d3.select("#map")
+    requestRedraw(){
+        this.graphService.regenarateGraph().subscribe({next: (graph:Graph) => {
+            console.log("redraw");
+            this.graphService.graph = graph;
+            this.draw();
+        }});
+    }
+
+    draw(){
+        console.log("draw");
+        let i = 0;
+        console.log(this.graphService.graph.nodes);
+
+            const svg = d3.select("#map")
       .append('svg')
       .attr("preserveAspectRatio", "xMinYMin meet")
       .attr("viewBox", "0 0 960 500")
       .attr("transform",
         `translate(${50}, ${50})`);
 
-      this.links.forEach(link => {
-        const source = this.nodes[link[0]];
-        const target = this.nodes[link[1]];
+      this.graphService.graph.edges.forEach(edge => {
+        const source = this.graphService.graph.nodes[edge.from_index];
+        const target = this.graphService.graph.nodes[edge.to_index];
         svg.append("line")
           .attr("x1", source.x*this.ratioX)
           .attr("y1", source.y*this.ratioY)
@@ -60,7 +63,7 @@ export class SvgMapComponent implements OnInit {
       
       const self = this; // store reference to 'this' context
     svg.selectAll('circle')
-      .data(this.nodes)
+      .data(this.graphService.graph.nodes)
       .enter()
       .append('circle')
       .attr('cx', d => d.x*this.ratioX)
@@ -75,7 +78,7 @@ export class SvgMapComponent implements OnInit {
       });
 
       svg.selectAll('text')
-      .data(this.nodes)
+      .data(this.graphService.graph.nodes)
       .enter()
       .append('text')
       .attr('x', d => d.x * this.ratioX)
@@ -85,7 +88,8 @@ export class SvgMapComponent implements OnInit {
       .attr('dy', '0.3em') // Adjust vertical alignment
       .style('fill', 'white')
       .style('font-size', '12px');
-  }
+    }
+
   
 
   onDotClick(nodeid: number): void {
@@ -96,9 +100,9 @@ export class SvgMapComponent implements OnInit {
       .attr("transform",
         `translate(${50}, ${50})`);
 
-      this.links.forEach(link => {
-        const source = this.nodes[link[0]];
-        const target = this.nodes[link[1]];
+      this.graphService.graph.edges.forEach(edge =>{
+        const source = this.graphService.graph.nodes[edge.from_index];
+        const target = this.graphService.graph.nodes[edge.to_index];
         svg.append("line")
           .attr("x1", source.x*this.ratioX)
           .attr("y1", source.y*this.ratioY)
@@ -110,7 +114,7 @@ export class SvgMapComponent implements OnInit {
       
       const self = this; // store reference to 'this' context
       svg.selectAll('circle')
-      .data(this.nodes)
+      .data(this.graphService.graph.nodes)
       .enter()
       .append('circle')
       .attr('cx', d => d.x*this.ratioX)

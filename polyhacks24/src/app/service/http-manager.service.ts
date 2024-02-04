@@ -7,10 +7,14 @@ import { Node, Edge, Graph, SolutionRequest, SolutionResponse } from '../interfa
   providedIn: 'root'
 })
 export class HttpManagerService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
 
- async getGraph(){
-    return await this.http.get('http://localhost:3000/graph');
+  }
+
+ getGraph(){
+    console.log("request")
+    let graph = this.http.get<Graph>('http://localhost:3000/graph');
+    return graph;
 }
 
 async getSolution(graph: Graph, driverStart: number, driverEnd: number, passengerStart: number, passengerEnd: number) {
