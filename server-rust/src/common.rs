@@ -1,23 +1,11 @@
 use std::fmt::Debug;
 
-use serde::Serialize;
-use serde::ser::SerializeStruct;
+use serde::{Serialize, Deserialize};
 
+#[derive(Serialize, Deserialize)]
 pub struct Node {
     pub x: f32,
     pub y: f32,
-}
-
-impl Serialize for Node {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_struct("Node", 2)?;
-        state.serialize_field("x", &self.x)?;
-        state.serialize_field("y", &self.y)?;
-        state.end()
-    }
 }
 
 impl Debug for Node {
@@ -26,48 +14,33 @@ impl Debug for Node {
     }
 }
 
-pub struct Graph {
-    pub nodes: Vec<Node>,
-    pub edges: Vec<Edge>,
-}
-
-impl Serialize for Graph {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_struct("Graph", 2)?;
-        state.serialize_field("nodes", &self.nodes)?;
-        state.serialize_field("edges", &self.edges)?;
-        state.end()
-    }
-}
-
-impl Debug for Graph {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Graph {{ nodes: {:?}, edges: {:?} }}", self.nodes, self.edges)
-    }
-}
-
-pub struct Edge {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Edge{
     pub from_index: usize,
     pub to_index: usize,
 }
 
-impl Serialize for Edge {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_struct("Edge", 2)?;
-        state.serialize_field("from_index", &self.from_index)?;
-        state.serialize_field("to_index", &self.to_index)?;
-        state.end()
-    }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Graph{
+    pub nodes: Vec<Node>,
+    pub edges: Vec<Edge>,
 }
 
-impl Debug for Edge {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Edge {{ from_index: {}, to_index: {} }}", self.from_index, self.to_index)
-    }
+#[derive(Deserialize)]
+pub struct SolutionRequest{
+    pub graph: Graph,
+    pub driver_start: usize,
+    pub driver_end: usize,
+    pub passenger_start: usize,
+    pub passenger_end: usize,
+}
+
+
+#[derive(Serialize)]
+pub struct SolutionResponse{
+    pub driver_alone: Vec<usize>,
+    pub driver_alone_distance: f32,
+    pub driver_passenger: Vec<usize>,
+    pub driver_passenger_distance: f32,
 }

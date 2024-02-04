@@ -27,6 +27,7 @@ pub fn generate_grid() {
             let mut rng = thread_rng();
             edges.shuffle(&mut rng);
             let i2 = available_nodes.pop().unwrap();
+            if(i2 != i){
             if nodes.get(i).unwrap().x < nodes.get(i2).unwrap().x {
                 edges.push(Edge {
                     from_index: i,
@@ -37,7 +38,7 @@ pub fn generate_grid() {
                     from_index: i2,
                     to_index: i,
                 });
-            }
+            }}
             k += 1;
         }
     }
@@ -62,7 +63,7 @@ pub fn generate_grid() {
 pub fn check_if_edge_is_valid(edges: &Vec<Edge>, nodes: &Vec<Node>) -> bool {
     // Check if the edge is valid
     // Return true if valid, false otherwise
-    let mut is_valid = true;
+    let mut is_valid: bool = true;
     let mut edge: Edge = Edge {
         from_index: nodes.len(),
         to_index: nodes.len(),
@@ -81,16 +82,16 @@ pub fn check_if_edge_is_valid(edges: &Vec<Edge>, nodes: &Vec<Node>) -> bool {
             };
         }
 
-        for possibleCollision in edges.iter() {
+        for possible_collision in edges.iter() {
             let point11 = nodes.get(edge.from_index).unwrap();
             let point12 = nodes.get(edge.to_index).unwrap();
             let slope1 = (point12.y - point11.y) / (point12.x - point11.x);
 
-            let point21 = nodes.get(possibleCollision.from_index).unwrap();
-            let point22 = nodes.get(possibleCollision.to_index).unwrap();
+            let point21 = nodes.get(possible_collision.from_index).unwrap();
+            let point22 = nodes.get(possible_collision.to_index).unwrap();
             let slope2 = (point22.y - point21.y) / (point22.x - point21.x);
 
-            if might_touch(&edge, &possibleCollision, &nodes) {
+            if might_touch(&edge, &possible_collision, &nodes) {
                 if (slope1 > 0.0 && slope2 > 0.0) || (slope1 < 0.0 && slope2 < 0.0)
                 {
                     is_valid = true;
