@@ -2,14 +2,13 @@
 
 use std::fmt;
 use std::cmp::Ordering;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PathNode {
     pub index: usize,
-    pub x: f32,
-    pub y: f32,
-    pub seen: bool,
-    pub explored: bool,
     pub distance: f32,
+    pub seen : bool,
+    pub explored : bool,
+    pub predecessor: usize,
 }
 
 impl fmt::Display for PathNode {
