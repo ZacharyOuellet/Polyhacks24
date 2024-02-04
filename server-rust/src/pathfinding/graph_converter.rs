@@ -1,20 +1,29 @@
-use petgraph::graph::Graph as PetGraph;
-use petgraph::prelude::NodeIndex;
+use crate::common::Graph;
 use crate::pathfinding::path_types::PathNode;
 
-use crate::common::Graph;
-use crate::pathfinding::graph_converter::convert_to_petgraph;
+use petgraph::graph::Graph as PetGraph;
 
-fn distance_between_nodes(node1: &PathNode, node2: &PathNode) -> f32 {
-    ((node1.x - node2.x).powi(2) + (node1.y - node2.y).powi(2)).sqrt()
+pub fn convert_to_petgraph(graph: &Graph) -> PetGraph<PathNode, f32> {
+    let mut petgraph = PetGraph::new();
+    let mut nodes = Vec::new();
+    for (index, node) in graph.nodes.iter().enumerate() {
+        nodes.push(petgraph.add_node(PathNode {
+            index: index,
+            x: node.x,
+            y: node.y,
+            seen: false,
+            explored: false,
+            distance: 0.0,
+        }));
+    }
+    for edge in &graph.edges {
+        let distance = ((graph.nodes[edge.from_index].x - graph.nodes[edge.to_index].x).powi(2) + (graph.nodes[edge.from_index].y - graph.nodes[edge.to_index].y).powi(2)).sqrt();
+        petgraph.add_edge(nodes[edge.from_index], nodes[edge.to_index], distance);
+    }
+    petgraph
 }
 
-pub fn shortest_path(graph: &PetGraph<PathNode, f32>, start: usize, end: usize) -> Vec<usize> {
-    let end_node = graph.node_weight(NodeIndex::new(end)).unwrap();
-    Vec::new()
-}
-
-pub fn test(){
+pub fn test() {
     let graph = Graph {
         nodes: vec![
             crate::common::Node { x: 0.0, y: 0.0 },
@@ -43,6 +52,4 @@ pub fn test(){
     };
     let petgraph = convert_to_petgraph(&graph);
     println!("{:?}", petgraph);
-    let path = shortest_path(&petgraph, 0, 2);
-    println!("{:?}", path);
 }
