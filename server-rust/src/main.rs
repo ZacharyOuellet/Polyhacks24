@@ -1,14 +1,13 @@
 use axum::{routing::get, Router};
-
+use grid_generator::gridgeneration;
+pub mod grid_generator;
 pub mod pathfinding;
 use pathfinding::a_star;
-
 pub mod common;
-
 #[tokio::main]
 async fn main() {
     let app = Router::new().route("/", get(|| async { "Hello, Rust!" }));
-
+    gridgeneration::generate_grid();
     a_star::test();
     let a = common::Node{x: 1.0, y: 2.0};
     println!("{} {}", a.x, a.y);
