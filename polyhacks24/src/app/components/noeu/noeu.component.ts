@@ -11,11 +11,15 @@ import * as d3 from 'd3';
 export class NoeuComponent {
   @Input() x: number=0;
   @Input() y: number=0;
+  @Input() id: number=0;
   @Output() dotClick: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(){}
   
   onDotClick(): void {
     this.dotClick.emit();
+  }
+  click(){
+    console.log('id : '+this.id.toString());
   }
 }

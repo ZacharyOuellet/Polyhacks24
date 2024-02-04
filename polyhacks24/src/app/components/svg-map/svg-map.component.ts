@@ -21,6 +21,7 @@ export class SvgMapComponent implements OnInit {
     @Input() links : number[][];
     ratioX : number = 890-50;
     ratioY : number = 480-50;
+    nodeId : number = -1;
     constructor(){
       this.nodes = [
         { id: 0, x:0.7, y: 0.5},
@@ -58,22 +59,16 @@ export class SvgMapComponent implements OnInit {
       .attr('cx', d => d.x*this.ratioX)
       .attr('cy', d => d.y*this.ratioY)
       .attr('r', 10)
+      .attr('id', d => d.id) 
       .style('fill', 'red')
-      .on('click', function(d) {
-        self.onDotClick(d);
+      .on('click', function() {
+        console.log(this.id);
       });
   }
 
-  onDotClick(node : Node): void {
-    console.log(`Clicked node ${node.id}`);
+  onDotClick(nodeid: number): void {
+    console.log(`Clicked node ${nodeid}`);
     // Handle click event here
-  }
-
-  transfPosX(pX: number): number{
-    return this.ratioX*pX;
-  }
-  transfPosY(pY: number): number {
-    return this.ratioY*pY;
   }
 }
 
