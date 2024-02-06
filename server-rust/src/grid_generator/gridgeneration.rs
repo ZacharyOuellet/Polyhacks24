@@ -14,6 +14,11 @@ pub async fn generate_grid() -> Result<Json<Graph>, Infallible> {
     let mut nodes: Vec<Node> = Vec::new();
     let mut edges: Vec<Edge> = Vec::new();
 
+
+    let n_nodes = 1000;
+
+    let mut connected_to_n: Vec<usize> = vec![0; n_nodes];
+
     nodes.push(create_random_node(0));
     nodes.push(create_random_node(1));
     edges.push(Edge {
@@ -21,7 +26,7 @@ pub async fn generate_grid() -> Result<Json<Graph>, Infallible> {
         to_index: 1,
     });
 
-    for new_node_i in 2..200 {
+    for new_node_i in 2..n_nodes {
         nodes.push(create_random_node(new_node_i));
         let mut available_edges: Vec<Edge> = Vec::new();
         
@@ -75,14 +80,16 @@ pub async fn generate_grid() -> Result<Json<Graph>, Infallible> {
                 available_edges.push(available);
             }
         }
-        for _ in 0..2 {
+        available_edges.sort_by(|a, b| connected_to_n.get(b.to_index).cmp(&connected_to_n.get(a.to_index)));
+        let n_edges = rand::thread_rng().gen_range(1..=3);
+        for _ in 0..n_edges {
             // Do something in the loop
-            if available_edges.last().is_none() {
+            if available_edges.is_empty() {
                 break;
             }
-            let mut rng = thread_rng();
-            available_edges.shuffle(&mut rng);
             let rand_edge = available_edges.pop().unwrap();
+            *connected_to_n.get_mut(rand_edge.from_index).unwrap() += 1;
+            *connected_to_n.get_mut(rand_edge.to_index).unwrap() += 1;
             edges.push(rand_edge);
         }
     }
