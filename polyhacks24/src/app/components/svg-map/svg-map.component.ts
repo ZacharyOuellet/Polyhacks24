@@ -58,7 +58,7 @@ export class SvgMapComponent  {
           .attr("x2", target.x*this.ratioX)
           .attr("y2", target.y*this.ratioY)
           .style("stroke", "black")
-          .style("stroke-width", 2);
+          .style("stroke-width", 1);
       });
       
       const self = this; // store reference to 'this' context
@@ -68,7 +68,7 @@ export class SvgMapComponent  {
       .append('circle')
       .attr('cx', d => d.x*this.ratioX)
       .attr('cy', d => d.y*this.ratioY)
-      .attr('r', 10)
+      .attr('r', 5)
       .attr('id', d => d.id) 
       .style('fill', 'red')
       .on('click', function() {
@@ -87,7 +87,7 @@ export class SvgMapComponent  {
       .attr('text-anchor', 'middle')
       .attr('dy', '0.3em') // Adjust vertical alignment
       .style('fill', 'white')
-      .style('font-size', '12px');
+      .style('font-size', '6px');
     }
 
   
